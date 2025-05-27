@@ -43,7 +43,7 @@ penteledata-login/
 
 ### 1. Clone the Repository
 ```bash
-git clone <https://github.com/iMorgann/ptd>
+git clone https://github.com/iMorgann/ptd
 cd penteledata-login
 ```
 
