@@ -17,7 +17,7 @@ const LoginPage = () => {
     setLoginStatus('');
 
     try {
-      const response = await fetch('https://ptdbackend.onrender.com/login', {
+      const response = await fetch('https://ptdbackend.vercel.app/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
